@@ -1,0 +1,59 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Donghyunchop (동현촙): a single-player pencil-sketch rescue-helicopter laboratory in the manner of Choplifter II, with the number of helicopters, the starting stage, the paper colour and the seating capacity set through the esoteric language Donghyun-lang"
+type: software
+version: "0.01"
+date-released: "2026-11-24"
+authors:
+  - family-names: Kim
+    given-names: Dong Hyun
+    orcid: "https://orcid.org/0000-0001-9883-0229"
+    affiliation: "Inha University College of Medicine"
+license: MIT
+repository-code: "https://github.com/Raspberry-Kim/donghyun-lab22"
+url: "https://raspberry-kim.github.io/donghyun-lab22/"
+abstract: >-
+  Donghyunchop is a browser-based, noncommercial toy that follows the
+  controls and rules of Choplifter II (Beam Software, Game Boy, 1991): a
+  side-view rescue helicopter flown with the directional keys, with
+  momentum and no gravity, a nose that turns left, front and right on a
+  short tap, backward flight, a machine gun, a secondary weapon (bomb,
+  missile or shield) and a damage bar. The player lands beside barracks
+  and on rooftops, takes people aboard one at a time and carries them back
+  to the base; each of the seven stages has a rescue target. The field is
+  a wide 400x225 view rather than the original 160x144 screen, the seven
+  stages are newly built, and hitting terrain causes damage instead of an
+  immediate crash. The number of helicopters (1-9), the starting stage
+  (1-7), the paper colour (rough cream or sketchbook white) and the
+  seating capacity (4-16) are chosen through a program written in the
+  esoteric programming language Donghyun-lang. Input is keyboard, an
+  on-screen directional pad with buttons, and gamepad, with fullscreen.
+  The one image file is the title on the briefing screen, written by hand
+  by the author; every helicopter, person, vehicle, terrain and the paper
+  grain is drawn by code as wobbly graphite strokes when the page opens,
+  in greyscale on paper, using the pencil engine of Donghyuns. Clearing
+  all seven stages is celebrated with falling petals and a short fanfare
+  synthesised in the browser from the trio melody of Elgar's Pomp and
+  Circumstance March No. 1 (1901, public domain); no recording is used.
+  No graphics, sound, text, stage data or code of the original game is
+  used or extracted; all numbers are the author's own. The MIT license
+  applies to the Donghyunchop code and documentation; the page fonts are
+  under the SIL Open Font License, and the handwritten title remains the
+  work of its writer. See LICENSE and CREDITS.md.
+keywords:
+  - rescue helicopter game
+  - side-scrolling
+  - procedural drawing
+  - esoteric programming language
+  - JavaScript
+references:
+  - type: software
+    title: "Donghyun-lang (동현랭): a Korean esoteric programming language with a browser playground"
+    authors:
+      - family-names: Kim
+        given-names: Dong Hyun
+        orcid: "https://orcid.org/0000-0001-9883-0229"
+        affiliation: "Inha University College of Medicine"
+    version: "1.55"
+    license: MIT
+    repository-code: "https://github.com/Raspberry-Kim/donghyun-lang"
