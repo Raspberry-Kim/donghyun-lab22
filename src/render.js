@@ -213,7 +213,7 @@
     const bx = X(g.base.x); this.stroke([[bx, my + 3], [bx, my - 4]], 0.7, 0.9); c.fillStyle = DS.INK; c.globalAlpha = 0.8; c.fillRect(bx * S, (my - 4) * S, 4 * S, 2.6 * S);
     for (let i = 0; i < g.huts.length; i++) { const h = g.huts[i]; let n = h.n; if (!n) for (let j = 0; j < g.hs.length; j++) if (g.hs[j].st !== 'gone' && g.hs[j].st !== 'base' && Math.abs(g.hs[j].x - h.x) < 60) { n = 1; break; } const hx = X(h.x); c.globalAlpha = 0.85; if (n) c.fillRect((hx - 1.6) * S, (my - 0.6) * S, 3.2 * S, 3.2 * S); else { c.strokeStyle = DS.INK; c.lineWidth = 0.5 * S; c.strokeRect((hx - 1.6) * S, (my - 0.6) * S, 3.2 * S, 3.2 * S); } }
     const px = X(p.x); c.globalAlpha = 0.95; c.beginPath(); c.moveTo(px * S, (my + 2.4) * S); c.lineTo((px - 2.6) * S, (my + 8) * S); c.lineTo((px + 2.6) * S, (my + 8) * S); c.closePath(); c.fill(); c.globalAlpha = 1;
-    if (I) this.text('점수 ' + g.score, W - 78, 8, 9, 'right', 0.9); else this.text('최고 ' + g.hi, W - 6, 8, 8.5, 'right', 0.8);
+    if (I) this.text('점수 ' + g.score, this.scoreX || W - 78, 8, 9, 'right', 0.9); else this.text('최고 ' + g.hi, W - 6, 8, 8.5, 'right', 0.8);
     if (g.msg && g.mode === 'play') this.text(g.msg.txt, W / 2, 26, 11, 'center', Math.min(1, g.msg.t / 20));
     if (p.shield > 0 && g.mode === 'play') this.text('방패 ' + Math.ceil(p.shield / 60), W / 2, 38, 8.5, 'center', 0.85);
 

@@ -1,4 +1,4 @@
-# 동현촙 v0.10
+# 동현촙 v0.11
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24486348.svg)](https://doi.org/10.5281/zenodo.24486348)
 
@@ -7,7 +7,7 @@
 
 바로 하기: https://raspberry-kim.github.io/donghyun-lab22/
 
-모든 판을 묶는 DOI는 [`10.5281/zenodo.24486348`](https://doi.org/10.5281/zenodo.24486348)이다. 이번 판은 [v0.10 릴리스](https://github.com/Raspberry-Kim/donghyun-lab22/releases/tag/v0.10)이다. 판마다의 Zenodo 보관본은 위 DOI 쪽의 판 목록에서 고른다.
+모든 판을 묶는 DOI는 [`10.5281/zenodo.24486348`](https://doi.org/10.5281/zenodo.24486348)이다. 이번 판은 [v0.11 릴리스](https://github.com/Raspberry-Kim/donghyun-lab22/releases/tag/v0.11)이다. 판마다의 Zenodo 보관본은 위 DOI 쪽의 판 목록에서 고른다.
 
 ## 규칙
 
