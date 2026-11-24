@@ -12,10 +12,10 @@
 
 ## 동현촙이 새로 만든 것
 
-- 게임 엔진(`src/game.js`), 스테이지 일곱 장(`src/level.js`), 그림(`src/art.js`), 화면(`src/render.js`), 입력(`src/input.js`), 출전·메뉴(`src/app.js`), 동현랭 출전 규약과 예제(`src/examples.js`), 문서, 시험.
+- 게임 엔진(`src/game.js`), 스테이지 일곱 장(`src/level.js`), 그림(`src/art.js`), 화면(`src/render.js`), 입력(`src/input.js`), 출전·메뉴·저장(`src/app.js`), 동현랭 출전 규약과 예제(`src/examples.js`), 문서, 시험.
 - 연필 선과 종이(`src/sketch.js`)는 [동현스](https://github.com/Raspberry-Kim/donghyun-lab21)의 연필 엔진을 가져다 썼다. 효과음과 팡파르 합성(`src/sfx.js`), 게임패드, 편집기·전체 화면 메뉴도 동현스의 방식을 따랐다.
 - 그림 파일은 출전 준비 화면의 제목 한 장(`src/title.png`)이다. 그 밖의 헬기, 사람, 전차, 땅, 나무, 구름, 폭발, 종이의 결은 쪽이 열릴 때 코드가 연필 선을 그어 만든다.
-- 출전 준비 화면의 제목 ‘동현촙’은 제작자가 직접 쓴 글씨다. 이 글씨에 대한 권리는 MIT 코드 라이선스와 별개로 쓴 사람에게 있다. 코드를 가져다 쓸 때 이 글씨는 바꿔 쓰기를 권한다.
+- 출전 준비 화면의 제목 ‘동현촙’은 제작자 본인이 직접 쓴 글씨다. 이 글씨에 대한 권리는 MIT 코드 라이선스와 별개로 쓴 사람에게 있다. 코드를 가져다 쓸 때 이 글씨는 바꿔 쓰기를 권한다.
 - 동현랭 실행기(`src/donghyun.js`)는 [동현랭 저장소](https://github.com/Raspberry-Kim/donghyun-lang)의 v1.55를 고치지 않고 썼다.
 
 ## 승리 팡파르와 꽃비
@@ -38,7 +38,7 @@
 
 ## 글꼴
 
-검은고딕 Black Han Sans · Pretendard · 나눔고딕코딩 · 개구 Gaegu — SIL Open Font License 1.1 (`licenses/`). 게임 화면의 글은 손글씨 글꼴 Gaegu에서 쓰는 글자만 추려 담았다. 출전 준비 화면의 제목은 글꼴이 아니라 제작자가 직접 쓴 글씨다.
+검은고딕 Black Han Sans · Pretendard · 나눔고딕코딩 · 개구 Gaegu — SIL Open Font License 1.1 (`licenses/`). 게임 화면의 글은 손글씨 글꼴 Gaegu에서 쓰는 글자만 추려 담았다. 출전 준비 화면의 제목 ‘동현촙’은 글꼴이 아니라 제작자 본인이 직접 쓴 글씨이고, 이 글씨의 권리는 MIT와 별개로 쓴 사람에게 있다.
 
 ## 라이선스
 

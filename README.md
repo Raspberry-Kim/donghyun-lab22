@@ -1,4 +1,4 @@
-# 동현촙 v0.01
+# 동현촙 v0.02
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24486348.svg)](https://doi.org/10.5281/zenodo.24486348)
 
@@ -7,7 +7,7 @@
 
 바로 하기: https://raspberry-kim.github.io/donghyun-lab22/
 
-모든 판을 묶는 DOI는 [`10.5281/zenodo.24486348`](https://doi.org/10.5281/zenodo.24486348)이다. 이번 판은 [v0.01 릴리스](https://github.com/Raspberry-Kim/donghyun-lab22/releases/tag/v0.01)이며 Zenodo 보관본은 [records/24486349](https://zenodo.org/records/24486349)(DOI `10.5281/zenodo.24486349`)이다.
+모든 판을 묶는 DOI는 [`10.5281/zenodo.24486348`](https://doi.org/10.5281/zenodo.24486348)이다. 이번 판은 [v0.02 릴리스](https://github.com/Raspberry-Kim/donghyun-lab22/releases/tag/v0.02)이다. 판마다의 Zenodo 보관본은 위 DOI 쪽의 판 목록에서 고른다.
 
 ## 규칙
 
@@ -21,6 +21,7 @@
 - **보조 무기 상자**: B 폭탄 +3, M 미사일 +2, S 방패 +1. 처음에는 폭탄 3개를 가지고 나선다.
 - 비구름 밑의 비, 바닥에서 솟는 간헐천, 탑의 번개, 떨어지는 종유석, 바닷물은 모두 피해를 준다. 경보기는 가까이 가면 울려 제트기를 부른다.
 - 목표보다 더 구한 사람은 한 명에 200점이다. 게임 오버에서 **이어 하기**를 고르면 그 스테이지를 처음부터 다시 하고 점수는 0부터 다시 센다.
+- **저장**: Enter 메뉴에서 브라우저 칸 3개나 `.dhsave` 파일로 판을 저장하고, 출전 준비 화면이나 메뉴에서 불러온다. 헬기와 사람, 적과 탄의 자리까지 그대로 돌아오며, 불러온 직후에는 멈춘 채로 기다린다.
 
 ## 스테이지 일곱
 
@@ -36,7 +37,7 @@
 
 ## 조작
 
-- 키보드: ←→↑↓ 날기(누르고 있으면 속도가 붙고 떼면 미끄러지다 멎는다. 중력은 없다) · **← → 짧게 톡** 기수 돌리기(왼쪽 ↔ 정면 ↔ 오른쪽) · **X 또는 Space** 기관포(A) · **Z** 보조 무기(B) · C 또는 Shift 보조 무기 바꾸기 · Enter·Esc·P 메뉴(계속 간다 · 소리 · 포기하고 출전 준비로) · M 효과음 · F 전체 화면.
+- 키보드: ←→↑↓ 날기(누르고 있으면 속도가 붙고 떼면 미끄러지다 멎는다. 중력은 없다) · **← → 짧게 톡** 기수 돌리기(왼쪽 ↔ 정면 ↔ 오른쪽) · **X 또는 Space** 기관포(A) · **Z** 보조 무기(B) · C 또는 Shift 보조 무기 바꾸기 · Enter·Esc·P 메뉴(계속 간다 · 소리 · 저장 · 불러오기 · 포기하고 출전 준비로) · M 효과음 · F 전체 화면.
 - 보는 쪽과 반대로 누르면 기수는 그대로 둔 채 뒤로 난다. 정면을 볼 때는 기관포 탄이 곧장 아래로 떨어진다. 앞으로 날며 ↓를 누르면 비스듬히 아래로 나간다.
 - 손가락: 화면 아래 왼쪽의 십자 버튼에 손가락을 대고 미끄러뜨리면 방향이 따라 바뀐다. 좌우를 짧게 톡 치면 기수가 돈다. 오른쪽에 **A**(기관포) · **B**(보조 무기) · **무기**(바꾸기) · **메뉴** 버튼이 있다.
 - 게임패드(닌텐도 배치): A·R 기관포 · B·L 보조 무기 · X·Y·ZL·ZR 보조 무기 바꾸기 · 십자·왼 스틱 날기 · + 메뉴. A와 B가 거꾸로 들어오면 −(Select)로 바꾼다.
@@ -67,19 +68,20 @@
 ## 파일
 
 - `index.html` — 묶은 한 파일(글꼴 포함). `node build.cjs`로 `src/`에서 만든다.
-- `src/game.js` 엔진(헬기·사람·적·탄·점수) · `src/level.js` 스테이지 일곱 장 · `src/sketch.js` 연필 선과 종이 · `src/art.js` 그림 · `src/render.js` 화면 · `src/input.js` 입력 · `src/app.js` 출전·메뉴 · `src/examples.js` 예제 · `src/donghyun.js` 동현랭 실행기 v1.55 · `src/sfx.js` 효과음과 승리 팡파르 · `src/petals.js` 엔딩의 꽃비 · `src/gamepad.js` 게임패드 · `src/title.png` 출전 준비 화면의 제목(제작자가 직접 쓴 글씨, 그림 파일은 이 한 장이다).
-- `qa/smoke.cjs` 첫 화면과 출전 · `qa/auto.cjs` 자동 조종으로 일곱 스테이지 완주 · `qa/manual.cjs` 키 조작 · `qa/ui.cjs` 데스크톱·휴대폰 화면 · `qa/proto.cjs` 출전 규약과 예제 · `qa/end.cjs` 엔딩 · `qa/docs.cjs` 문서와 판 번호(Playwright, `qa/docs.cjs`는 node).
+- `src/game.js` 엔진(헬기·사람·적·탄·점수) · `src/level.js` 스테이지 일곱 장 · `src/sketch.js` 연필 선과 종이 · `src/art.js` 그림 · `src/render.js` 화면 · `src/input.js` 입력 · `src/app.js` 출전·메뉴·저장 · `src/examples.js` 예제 · `src/donghyun.js` 동현랭 실행기 v1.55 · `src/sfx.js` 효과음과 승리 팡파르 · `src/petals.js` 엔딩의 꽃비 · `src/gamepad.js` 게임패드 · `src/title.png` 출전 준비 화면의 제목(제작자 본인이 직접 쓴 글씨, 그림 파일은 이 한 장이다).
+- `qa/smoke.cjs` 첫 화면과 출전 · `qa/auto.cjs` 자동 조종으로 일곱 스테이지 완주 · `qa/manual.cjs` 키 조작 · `qa/ui.cjs` 데스크톱·휴대폰 화면 · `qa/proto.cjs` 출전 규약과 예제 · `qa/end.cjs` 엔딩 · `qa/save.cjs` 저장·불러오기 · `qa/docs.cjs` 문서와 판 번호(Playwright, `qa/docs.cjs`는 node).
 - `tools/subset-font.py` — 게임 화면 손글씨(Gaegu)에서 쓰는 글자만 추린다. 게임 화면의 글을 고치면 다시 돌린다. 추린 글자는 `fonts/Gaegu.subset.txt`에 적힌다.
 
 ## 한계
 
 - 배경 음악은 없다. 효과음과, 일곱 스테이지를 마쳤을 때의 짧은 승리 팡파르가 있다.
-- 저장·불러오기와 난이도 고르기는 없다. 2인용도 없다.
+- 난이도 고르기와 2인용은 없다.
+- 브라우저 칸에 저장한 판은 그 기기의 그 브라우저에만 남는다. 오래 둘 판은 `.dhsave` 파일로 내려받아 둔다.
 - 실기기 미확인.
 
 ## 출처와 라이선스
 
-`CREDITS.md`를 보라. 코드·문서는 MIT(`LICENSE`), 글꼴은 SIL Open Font License(`licenses/`). 원작 게임의 그림·소리·글·자료·코드는 쓰지 않았다. 출전 준비 화면의 제목 ‘동현촙’은 제작자가 직접 쓴 글씨이며, 이 글씨의 권리는 MIT와 별개로 쓴 사람에게 있다.
+`CREDITS.md`를 보라. 코드·문서는 MIT(`LICENSE`), 글꼴은 SIL Open Font License(`licenses/`). 원작 게임의 그림·소리·글·자료·코드는 쓰지 않았다. 출전 준비 화면의 제목 ‘동현촙’은 글꼴이 아니라 제작자 본인이 직접 쓴 글씨이며, 이 글씨의 권리는 MIT와 별개로 쓴 사람에게 있다.
 
 ## 시리즈 연결
 
