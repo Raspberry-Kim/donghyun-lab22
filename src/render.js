@@ -176,7 +176,7 @@
   };
   function clampRot(v) { return v < -0.2 ? -0.2 : v > 0.2 ? 0.2 : v; }
 
-  /* 계기판: 아래 20칸. 왼쪽부터 남은 구출 목표 · 탑승 · 구출 · 희생 · 보조 무기 · 헬기 · 피해 막대 · 점수 */
+  /* 계기판: 아래 20칸. 왼쪽부터 남은 구출 목표 · 탑승 · 구출 · 희생 · 보조 무기 · 헬기 · 데미지 막대 · 점수 */
   R.hud = function (g) {
     const c = this.c, p = g.pl, y = VH + 10.5, L = g.L;
     this.stroke([[2, VH + 0.4], [130, VH + 0.9], [270, VH + 0.2], [W - 2, VH + 0.7]], 0.9, 0.85); this.stroke([[3, VH + 1.2], [200, VH + 0.6], [W - 3, VH + 1.3]], 0.5, 0.4);
@@ -189,21 +189,21 @@
       col(156, '희생', String(g.lost));
       this.box(196, VH + 3.6, 44, 13.4, 5, 0.6, 0.7, 0.5);
       this.text(g.wsel, 204, y, 11, 'center'); this.text(DS.WPN[g.wsel].name.slice(0, 2) + ' ' + g.wp[g.wsel], 211, y, 8.5, 'left', g.wp[g.wsel] > 0 ? 0.95 : 0.5);
-      c.globalAlpha = 0.95; c.drawImage(hs, 246 * S, (VH + 4.5) * S, 24 * S, 12 * S); c.globalAlpha = 1;
-      this.text('×' + g.lives, 271, y, 11, 'left');
-      this.text('피해', 294, y - 0.4, 7.5, 'left', 0.72); this.bar(311, VH + 7.4, 44, 6, Math.min(1, p.dmg / 100));
+      c.globalAlpha = 0.95; c.drawImage(hs, 244 * S, (VH + 4.5) * S, 24 * S, 12 * S); c.globalAlpha = 1;
+      this.text('×' + g.lives, 269, y, 11, 'left');
+      this.text('데미지', 288.5, y - 0.4, 7.5, 'left', 0.72); this.bar(311.5, VH + 7.4, 43.5, 6, Math.min(1, p.dmg / 100));
       this.text(String(g.score), W - 6, y, 11.5, 'right');
     } else {      // 가로 휴대폰 전체 화면: 양옆 버튼 사이로 모아 쓴다 (점수는 위로)
       const k = (W - 2 * I) / 288;
       col(x0 + 1 * k, '목표', String(Math.max(0, g.need - g.saved - g.aboard)), true);
-      col(x0 + 37 * k, '탑승', g.aboard + '/' + g.cap);
-      col(x0 + 85 * k, '구출', String(g.saved));
-      col(x0 + 121 * k, '희생', String(g.lost));
-      const bx0 = x0 + 153 * k; this.box(bx0, VH + 3.6, 42, 13.4, 5, 0.6, 0.7, 0.5);
+      col(x0 + 35 * k, '탑승', g.aboard + '/' + g.cap);
+      col(x0 + 82 * k, '구출', String(g.saved));
+      col(x0 + 117 * k, '희생', String(g.lost));
+      const bx0 = x0 + 149 * k; this.box(bx0, VH + 3.6, 42, 13.4, 5, 0.6, 0.7, 0.5);
       this.text(g.wsel, bx0 + 7, y, 11, 'center'); this.text(DS.WPN[g.wsel].name.slice(0, 2) + ' ' + g.wp[g.wsel], bx0 + 14, y, 8.5, 'left', g.wp[g.wsel] > 0 ? 0.95 : 0.5);
-      c.globalAlpha = 0.95; c.drawImage(hs, (x0 + 199 * k) * S, (VH + 4.5) * S, 24 * S, 12 * S); c.globalAlpha = 1;
-      this.text('×' + g.lives, x0 + 199 * k + 24, y, 11, 'left');
-      this.text('피해', x0 + 244 * k, y - 0.4, 7.5, 'left', 0.72); this.bar(x0 + 244 * k + 16, VH + 7.4, 288 * k - 244 * k - 18, 6, Math.min(1, p.dmg / 100));
+      c.globalAlpha = 0.95; c.drawImage(hs, (x0 + 194 * k) * S, (VH + 4.5) * S, 24 * S, 12 * S); c.globalAlpha = 1;
+      this.text('×' + g.lives, x0 + 194 * k + 23, y, 11, 'left');
+      this.text('데미지', x0 + 240 * k, y - 0.4, 7.5, 'left', 0.72); this.bar(x0 + 240 * k + 20.5, VH + 7.4, 288 * k - 240 * k - 22.5, 6, Math.min(1, p.dmg / 100));
     }
     // 위: 스테이지 이름과 가로 지도 (왼쪽 끝 0 ~ 오른쪽 끝 len)
     this.text(g.S.sub + ' · ' + g.S.name, 6, 8, 8.5, 'left', 0.8);

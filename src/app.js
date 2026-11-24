@@ -54,9 +54,9 @@ const FOES = [
   ['sub', '잠수함', '물 위로 떠올라 위로 미사일을 쏘고 다시 잠긴다.'],
   ['ltw', '번개 탑', '불꽃이 튄 뒤 위로 번개를 친다. 번개가 멎은 사이에 지나간다.'],
   ['bird', '새', '무리 지어 오간다. 부딪히면 다친다.'],
-  ['rcloud', '비구름', '밑에 비가 내린다. 비를 맞는 동안 피해가 조금씩 쌓인다.'],
+  ['rcloud', '비구름', '밑에 비가 내린다. 비를 맞는 동안 데미지가 조금씩 쌓인다.'],
   ['stal', '종유석', '밑을 지나면 흔들리다 떨어진다. 쏘아서 미리 떨어뜨릴 수 있다.'],
-  ['star', '별', '피해를 0으로 돌리고 100점을 준다.'],
+  ['star', '별', '데미지를 0으로 돌리고 100점을 준다.'],
   ['itbox', '보조 무기 상자', 'B 폭탄 +3 · M 미사일 +2 · S 방패 +1.']
 ];
 $('#foe-grid').innerHTML = FOES.map(f => `<article><canvas width="168" height="120" data-spr="${f[0]}" role="img" aria-label="${esc(f[1])} 연필 그림"></canvas><div><h4>${esc(f[1])}</h4><p>${esc(f[2])}</p></div></article>`).join('');
@@ -191,7 +191,7 @@ let hudText = '';
 function hud() {
   const g = A.g; let rows;
   if (!g) rows = [['헬기', cfg.lives], ['시작 스테이지', `${cfg.stage} · ${stageName(cfg.stage - 1)}`], ['종이', paperName(cfg)], ['정원', cfg.cap + '명']];
-  else rows = [['스테이지', `${g.stage + 1} / ${NSTAGE} · ${g.S.name}`], ['구출', `${g.saved} / 목표 ${g.need}`], ['탑승', `${g.aboard} / ${g.cap}`], ['기다리는 사람', `${Math.max(0, g.total - g.saved - g.lost - g.aboard)}명`], ['희생', g.lost + '명'], ['헬기', g.mode === 'over' ? 0 : g.lives], ['피해', Math.min(100, Math.round(g.pl.dmg)) + ' / 100'], ['보조 무기', `폭탄 ${g.wp.B} · 미사일 ${g.wp.M} · 방패 ${g.wp.S}`], ['점수', NUM(g.score)], ['최고', NUM(Math.max(g.hi, A.hi))], ['이어 하기', g.conts + '번']];
+  else rows = [['스테이지', `${g.stage + 1} / ${NSTAGE} · ${g.S.name}`], ['구출', `${g.saved} / 목표 ${g.need}`], ['탑승', `${g.aboard} / ${g.cap}`], ['기다리는 사람', `${Math.max(0, g.total - g.saved - g.lost - g.aboard)}명`], ['희생', g.lost + '명'], ['헬기', g.mode === 'over' ? 0 : g.lives], ['데미지', Math.min(100, Math.round(g.pl.dmg)) + ' / 100'], ['보조 무기', `폭탄 ${g.wp.B} · 미사일 ${g.wp.M} · 방패 ${g.wp.S}`], ['점수', NUM(g.score)], ['최고', NUM(Math.max(g.hi, A.hi))], ['이어 하기', g.conts + '번']];
   const html = rows.map(([a, b]) => `<div><span>${a}</span><strong>${esc(b)}</strong></div>`).join('');
   if (html !== hudText) { hudText = html; $('#info-card').innerHTML = html; }
   if (g) { const d = `스테이지 ${g.stage + 1} · ${g.S.name}`, b = `구출 ${g.saved}/${g.need} · 헬기 ${g.mode === 'over' ? 0 : g.lives}`; if ($('#day').textContent !== d) $('#day').textContent = d; if ($('#turn-badge').textContent !== b) $('#turn-badge').textContent = b; }
