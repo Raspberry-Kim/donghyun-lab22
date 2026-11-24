@@ -378,7 +378,7 @@
       const it = I[i]; it.t++;
       if (it.fall) { const g = L.sea && L.gAt(it.x) > L.sea ? L.sea - 10 : L.gAt(it.x) - 16; if (it.y < g) it.y += 0.6; else it.fall = false; }
       if (!p.dead && Math.abs(it.x - p.x) < 20 && Math.abs(it.y - p.y) < 15) {
-        if (it.k === 'star') { p.dmg = 0; this.add(100); this.pop('피해 회복 +100', it.x, it.y - 12); this.sfx('extend'); }
+        if (it.k === 'star') { p.dmg = 0; this.add(100); this.pop('데미지 회복 +100', it.x, it.y - 12); this.sfx('extend'); }
         else { const w = DS.WPN[it.w]; this.wp[it.w] += w.get; if (this.wp[this.wsel] <= 0 || it.w !== this.wsel) this.wsel = it.w; this.pop(w.name + ' +' + w.get, it.x, it.y - 12); this.sfx('item'); }
         I.splice(i, 1);
       }
