@@ -31,7 +31,7 @@ const path = require('path'), fs = require('fs');
   await adv(60); g = await G(); ok(Math.abs(g.heli.vx) < 0.05, '떼면 미끄러지다 멈춤: vx ' + g.heli.vx);
   // 왼쪽으로 날며 기관포
   await pg.keyboard.down('ArrowLeft'); await adv(60); await pg.keyboard.down('KeyX'); await adv(20); g = await G(); ok(g.shots >= 1 && g.shots <= 3, '옆 기관포(화면에 최대 3발): ' + g.shots); await shot('gun'); await pg.keyboard.up('KeyX');
-  await adv(120); await pg.keyboard.up('ArrowLeft'); g = await G(); ok(g.heli.vx <= -1.59, '최고 속도 1.6: ' + g.heli.vx);
+  await adv(120); await pg.keyboard.up('ArrowLeft'); g = await G(); ok(g.heli.vx <= -1.75 && g.heli.vx >= -1.77, '기수가 보는 쪽 최고 속도 1.76: ' + g.heli.vx);
   // 보조 무기
   await hold('KeyZ', 2); g = await G(); ok(g.weapons.B === 2, 'Z 폭탄: 남은 ' + g.weapons.B);
   await hold('KeyC', 2); g = await G(); ok(g.weapon === 'B', 'C 바꾸기(다른 무기 없으면 그대로): ' + g.weapon);

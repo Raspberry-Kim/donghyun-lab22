@@ -37,6 +37,14 @@ let fails = 0; const ok = (c, m, x) => { if (!c) fails++; console.log((c ? 'ok  
         if (JSON.stringify(g.text()) !== JSON.stringify(g2.text()) || JSON.stringify(g.save()) !== JSON.stringify(g2.save())) { const A = g.save(), B = g2.save(), d = []; for (const k in A) if (JSON.stringify(A[k]) !== JSON.stringify(B[k])) d.push(k); out.fails.push(['흐름이 갈렸다', stage, god, seg, d]); }
       }
     }
+    /* 추락하는 중, 미사일·폭탄이 날아가는 중에 저장한 판: 자동 조종의 흐름에 기대지 않고 그 순간을 만들어 저장한다 */
+    {
+      const none = () => ({ l: false, r: false, u: false, d: false, a: false, aEdge: false, bEdge: false, selEdge: false, ok: false, tap: null });
+      const lift = () => { const g = new DS.Game({ stage: 0, lives: 3, cap: 10 }); for (let i = 0; i < 40; i++) { const o = none(); o.ok = true; g.update(o); } for (let i = 0; i < 60; i++) { const o = none(); o.u = true; g.update(o); } return g; };
+      const pair = (g, n, name) => { const g2 = DS.Game.load(JSON.parse(JSON.stringify(g.save())), {}); for (let i = 0; i < n; i++) { g.update(none()); g2.update(none()); } out.checks++; if (JSON.stringify(g.save()) !== JSON.stringify(g2.save())) out.fails.push([name + ': 흐름이 갈렸다']); };
+      { const g = lift(); g.crash(); for (let i = 0; i < 12; i++) g.update(none()); out.saw.dying += g.pl.dead ? 1 : 0; pair(g, 500, '추락하는 중 저장'); }
+      for (const w of ['M', 'B']) { const g = lift(); g.wp[w] = 2; g.wsel = w; const o = none(); o.bEdge = true; g.update(o); for (let i = 0; i < 4; i++) g.update(none()); out.saw[w === 'M' ? 'mis' : 'bomb'] += g.shots.some(q => q.k === (w === 'M' ? 'mis' : 'bomb')) ? 1 : 0; pair(g, 300, (w === 'M' ? '미사일' : '폭탄') + '이 날아가는 중 저장'); }
+    }
     /* 기수를 돌리는 중, 방향키를 누르고 있는 중에 저장한 판 */
     {
       const none = () => ({ l: false, r: false, u: false, d: false, a: false, aEdge: false, bEdge: false, selEdge: false, ok: false, tap: null });

@@ -4,7 +4,7 @@
   'use strict';
   const DS = window.DS, W = DS.W, VH = DS.VH, PI = Math.PI;
   /* 헬기: 가속·최고 속도·마찰, 톡 누르기 기준, 몸 크기 */
-  const K = DS.K = { AX: 0.055, VX: 1.6, FX: 0.057, AY: 0.06, VY: 1.05, FY: 0.045, TAP: 9, TURN: 9, HB: 9, HT: 10, HW: 13, WALL: 3.5, SHIELD: 600 };
+  const K = DS.K = { AX: 0.055, VX: 1.6, VF: 1.76, FX: 0.057, AY: 0.06, VY: 1.05, FY: 0.045, TAP: 9, TURN: 9, HB: 9, HT: 10, HW: 13, WALL: 3.5, SHIELD: 600 };
   const EN = DS.EN = {
     tank: { spr: 'tank', hw: 14, hh: 7, hp: 4, sc: 20, oy: 8, gr: 1, name: '전차' },
     jeep: { spr: 'jeep', hw: 11, hh: 6, hp: 2, sc: 20, oy: 6.4, gr: 1, name: '지프' },
@@ -130,10 +130,14 @@
     if (p.turn > 0 && --p.turn === 0 && p.pend) { const s = p.pend; p.pend = 0; T.turnTo(s); }
     let ix = (inp.r ? 1 : 0) - (inp.l ? 1 : 0), iy = (inp.d ? 1 : 0) - (inp.u ? 1 : 0);
     if (p.landed) { ix = 0; p.vx = 0; if (iy > 0) iy = 0; }
-    if (ix) p.vx = clamp(p.vx + ix * K.AX, -K.VX, K.VX); else { const s = Math.sign(p.vx); p.vx -= s * Math.min(Math.abs(p.vx), K.FX); }
+    // 가로 최고 속도: 기수가 보는 쪽으로 날 때 VF(1.76), 뒤로 날 때와 정면을 보고 옆으로 갈 때 VX(1.6).
+    // 기수를 돌려 한계가 낮아졌으면 뚝 끊지 않고 마찰만큼씩 줄여 맞춘다
+    const hi = p.face > 0 ? K.VF : K.VX, lo = p.face < 0 ? -K.VF : -K.VX;
+    if (ix) { const v = p.vx + ix * K.AX; p.vx = v > hi ? Math.max(hi, Math.min(v, p.vx - K.FX)) : v < lo ? Math.min(lo, Math.max(v, p.vx + K.FX)) : v; }
+    else { const s = Math.sign(p.vx); p.vx -= s * Math.min(Math.abs(p.vx), K.FX); }
     if (iy) p.vy = clamp(p.vy + iy * K.AY, -K.VY, K.VY); else { const s = Math.sign(p.vy); p.vy -= s * Math.min(Math.abs(p.vy), K.FY); }
     // 기울기: 보는 쪽으로 나아가면 기수를 숙이고, 뒤로 물러나면 든다. 앞으로 날며 ↓를 누르면 더 숙인다
-    const fwd = p.face ? p.vx * p.face / K.VX : p.vx / K.VX;
+    const fwd = p.face ? Math.min(1, p.vx * p.face / K.VX) : p.vx / K.VX;      // 1.6칸에서 다 숙인다. 그보다 빨라도 탄의 각도는 그대로다
     const want = p.face ? fwd * 0.2 + (inp.d && fwd > 0.2 && !p.landed ? 0.2 : 0) : fwd * 0.14;
     p.rot += (want - p.rot) * 0.15;
 
