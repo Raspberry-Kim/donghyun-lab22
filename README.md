@@ -1,9 +1,13 @@
 # 동현촙 v0.01
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24486348.svg)](https://doi.org/10.5281/zenodo.24486348)
+
 동현랭으로 출전 조건을 정하는 **1인용 가로 화면 구조 헬기 게임**이다. 거친 미색 종이 위에 연필로 그린 헬기를 조종해 막사와 옥상에서 기다리는 사람들을 기지로 데려온다. 부제는 ‘연필로 그린 구조 헬기’.
 동현 시리즈의 스물세 번째 작은 실험이다. 1991년 게임보이 게임 「Choplifter II」의 조작과 규칙을 참고했고 엔진·그림·소리·글·스테이지는 모두 새로 만들었다.
 
 바로 하기: https://raspberry-kim.github.io/donghyun-lab22/
+
+모든 판을 묶는 DOI는 [`10.5281/zenodo.24486348`](https://doi.org/10.5281/zenodo.24486348)이다. 이번 판은 [v0.01 릴리스](https://github.com/Raspberry-Kim/donghyun-lab22/releases/tag/v0.01)이며 Zenodo 보관본은 [records/24486349](https://zenodo.org/records/24486349)(DOI `10.5281/zenodo.24486349`)이다.
 
 ## 규칙
 
