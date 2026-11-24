@@ -1,4 +1,4 @@
-// 페이지 화면: 데스크톱 탭 다섯, 휴대폰 세로, 휴대폰 가로 전체 화면
+// 페이지 화면: 데스크톱 탭 다섯, 휴대폰 세로, 휴대폰 가로 전체 화면(넓은 것과 작은 것)
 const { chromium, devices } = require('/home/user/node_modules/playwright');
 const path = require('path');
 const url = 'file://' + path.join(__dirname, '..', 'dist', 'index.html');
@@ -34,6 +34,21 @@ const out = n => path.join(__dirname, 'tmp', n);
     await pg.evaluate(() => { const g = window.__donghyunchop.A.g; g.score = 12220; g.saved = 10; g.aboard = 10; g.lost = 2; g.pl.dmg = 60; window.__donghyunchop.fit(); document.querySelector('#full-hint').hidden = true; }); await pg.waitForTimeout(300); await pg.screenshot({ path: out('l-full.png') });
     console.log('l', JSON.stringify(await pg.evaluate(() => { const f = document.querySelector('#stage-full'), c = document.querySelector('#game').getBoundingClientRect(), d = document.querySelector('#dpad').getBoundingClientRect(), p = document.querySelector('.pad-btns').getBoundingClientRect(); return { cls: f.className, canvas: [c.left, c.top, c.width, c.height].map(Math.round), dpad: [d.left, d.top, d.width, d.height].map(Math.round), btns: [p.left, p.top, p.width, p.height].map(Math.round), mode: JSON.parse(window.render_game_to_text()).game.mode }; })));
     await pg.close();
+  }
+  if (!process.argv[2] || process.argv[2] === 's') {      // 작은 가로 휴대폰: 버튼이 계기판 줄을 덮지 않고, 위쪽 점수가 닫기 버튼 왼쪽에 있다
+    for (const [w, hh] of [[667, 375], [568, 320]]) {
+      const pg = await open({ viewport: { width: w, height: hh }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+      await pg.tap('#run'); await pg.waitForTimeout(600);
+      await pg.tap('#full'); await pg.waitForTimeout(800);
+      const box = await (await pg.$('#game')).boundingBox(); await pg.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2); await pg.waitForTimeout(900);
+      await pg.evaluate(() => { window.__donghyunchop.fit(); document.querySelector('#full-hint').hidden = true; }); await pg.waitForTimeout(300); await pg.screenshot({ path: out('s-full-' + w + '.png') });
+      const r = await pg.evaluate(() => { const q = s => document.querySelector(s).getBoundingClientRect(), c = q('#game'), R = window.__donghyunchop.A.render;
+        return { strip: Math.round(c.bottom - c.height * 20 / 225), pads: Math.round(Math.max(q('#dpad').bottom, q('.pad-btns').bottom)), inset: R.inset, score: Math.round(c.left + R.scoreX / 400 * c.width), exit: Math.round(q('.exit-full').left) }; });
+      if (!(r.pads <= r.strip)) errs.push('가로 ' + w + ': 버튼이 계기판 줄을 덮는다');
+      if (!(r.score < r.exit)) errs.push('가로 ' + w + ': 점수가 닫기 버튼에 가린다');
+      console.log('s', w, JSON.stringify(r));
+      await pg.close();
+    }
   }
   console.log('errors', errs.length, errs.slice(0, 5).join('\n'));
   await b.close();

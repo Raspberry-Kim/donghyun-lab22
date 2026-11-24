@@ -513,7 +513,7 @@ html{touch-action:manipulation}.stage-full,.board-stage,.touchpad,.dpad,.pad-key
 .stage-full.fs.side{display:flex;flex-direction:row;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 .stage-full.fs.side .board-top,.stage-full.fs.side .board-bottom{display:none}
 .stage-full.fs.side .board-stage{align-self:center}
-.stage-full.fs.side .touchpad.on{display:flex;position:absolute;left:0;right:0;bottom:0;max-width:none;width:auto;margin:0;padding:0 calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));align-items:flex-end;pointer-events:none;z-index:2}
+.stage-full.fs.side .touchpad.on{display:flex;position:absolute;left:0;right:0;bottom:var(--pad-lift,0px);max-width:none;width:auto;margin:0;padding:0 calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));align-items:flex-end;pointer-events:none;z-index:2}
 .stage-full.fs.side .touchpad.on .dpad,.stage-full.fs.side .touchpad.on .pad-btns{pointer-events:auto;opacity:.62}
 .stage-full.fs.side .touchpad.on .dpad{grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px)}
 .stage-full.fs.side .exit-full{opacity:.8}

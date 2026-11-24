@@ -316,14 +316,22 @@ function fit() {
     if (!side) { const tp = $('#touchpad'); ah -= h(full.querySelector('.board-top')) + h(full.querySelector('.board-bottom')) + (getComputedStyle(tp).display === 'none' ? 0 : h(tp) + 10) + 30; }
     canvas.style.width = Math.floor(Math.max(120, Math.min(aw, ah * ratio))) + 'px';
     // 가로 휴대폰: 겹쳐 놓은 버튼에 계기판 글자가 가리지 않게 안쪽으로 모은다
-    R.inset = 0;
+    R.inset = 0; R.scoreX = 0; full.style.removeProperty('--pad-lift');
     if (side && $('#touchpad').classList.contains('on')) {
-      const c = canvas.getBoundingClientRect(), d = $('#dpad').getBoundingClientRect(), b = $('.pad-btns').getBoundingClientRect();
-      if (c.width > 0 && d.width > 0) R.inset = Math.max(0, Math.min(62, Math.ceil(Math.max(d.right - c.left, c.right - b.left) / c.width * W) + 3));
+      const c = canvas.getBoundingClientRect(), d = $('#dpad').getBoundingClientRect(), b = $('.pad-btns').getBoundingClientRect(), x = full.querySelector('.exit-full').getBoundingClientRect();
+      if (c.width > 0 && x.width > 0) R.scoreX = Math.min(W - 78, Math.floor((x.left - c.left) / c.width * W) - 3);      // 위의 점수는 닫기 버튼 왼쪽에 둔다
+      if (c.width > 0 && d.width > 0) {
+        const need = Math.max(0, Math.ceil(Math.max(d.right - c.left, c.right - b.left) / c.width * W) + 3);
+        if (need <= 62) R.inset = need;
+        else {      // 버튼 사이가 좁아 계기판이 다 들어가지 않는 화면: 버튼을 계기판 줄 위로 올리고 계기판은 넓게 쓴다
+          R.inset = 10;
+          full.style.setProperty('--pad-lift', Math.max(0, Math.ceil(full.getBoundingClientRect().bottom - (c.bottom - c.height * (DS.H - DS.VH) / DS.H)) - 6) + 'px');
+        }
+      }
     }
     return;
   }
-  R.inset = 0;
+  R.inset = 0; R.scoreX = 0; full.style.removeProperty('--pad-lift');
   const wrap = $('#board-wrap'), cs = getComputedStyle(wrap), w = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); if (!(w > 0)) return;
   const maxH = Math.max(200, innerHeight - 130);
   canvas.style.width = Math.floor(Math.min(w, maxH * ratio)) + 'px';
