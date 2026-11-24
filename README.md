@@ -1,4 +1,4 @@
-# 동현촙 v0.06
+# 동현촙 v0.10
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24486348.svg)](https://doi.org/10.5281/zenodo.24486348)
 
@@ -7,7 +7,7 @@
 
 바로 하기: https://raspberry-kim.github.io/donghyun-lab22/
 
-모든 판을 묶는 DOI는 [`10.5281/zenodo.24486348`](https://doi.org/10.5281/zenodo.24486348)이다. 이번 판은 [v0.06 릴리스](https://github.com/Raspberry-Kim/donghyun-lab22/releases/tag/v0.06)이다. 판마다의 Zenodo 보관본은 위 DOI 쪽의 판 목록에서 고른다.
+모든 판을 묶는 DOI는 [`10.5281/zenodo.24486348`](https://doi.org/10.5281/zenodo.24486348)이다. 이번 판은 [v0.10 릴리스](https://github.com/Raspberry-Kim/donghyun-lab22/releases/tag/v0.10)이다. 판마다의 Zenodo 보관본은 위 DOI 쪽의 판 목록에서 고른다.
 
 ## 규칙
 
@@ -68,13 +68,13 @@
 ## 파일
 
 - `index.html` — 묶은 한 파일(글꼴 포함). `node build.cjs`로 `src/`에서 만든다.
-- `src/game.js` 엔진(헬기·사람·적·탄·점수) · `src/level.js` 스테이지 일곱 장 · `src/sketch.js` 연필 선과 종이 · `src/art.js` 그림 · `src/render.js` 화면 · `src/input.js` 입력 · `src/app.js` 출전·메뉴·저장 · `src/examples.js` 예제 · `src/donghyun.js` 동현랭 실행기 v1.55 · `src/sfx.js` 효과음과 승리 팡파르 · `src/petals.js` 엔딩의 꽃비 · `src/gamepad.js` 게임패드 · `src/title.png` 출전 준비 화면의 제목(제작자 본인이 직접 쓴 글씨, 그림 파일은 이 한 장이다).
-- `qa/smoke.cjs` 첫 화면과 출전 · `qa/auto.cjs` 자동 조종으로 일곱 스테이지 완주 · `qa/manual.cjs` 키 조작 · `qa/ui.cjs` 데스크톱·휴대폰 화면 · `qa/proto.cjs` 출전 규약과 예제 · `qa/end.cjs` 엔딩 · `qa/save.cjs` 저장·불러오기 · `qa/speed.cjs` 가로 최고 속도 · `qa/docs.cjs` 문서와 판 번호(Playwright, `qa/docs.cjs`는 node).
+- `src/game.js` 엔진(헬기·사람·적·탄·점수) · `src/level.js` 스테이지 일곱 장 · `src/sketch.js` 연필 선과 종이 · `src/art.js` 그림 · `src/render.js` 화면 · `src/input.js` 입력 · `src/app.js` 출전·메뉴·저장 · `src/examples.js` 예제 · `src/donghyun.js` 동현랭 실행기 v1.55 · `src/sfx.js` 효과음·헬기 날개 소리·승리 팡파르 · `src/petals.js` 엔딩의 꽃비 · `src/gamepad.js` 게임패드 · `src/title.png` 출전 준비 화면의 제목(제작자 본인이 직접 쓴 글씨, 그림 파일은 이 한 장이다).
+- `qa/smoke.cjs` 첫 화면과 출전 · `qa/auto.cjs` 자동 조종으로 일곱 스테이지 완주 · `qa/manual.cjs` 키 조작 · `qa/ui.cjs` 데스크톱·휴대폰 화면 · `qa/proto.cjs` 출전 규약과 예제 · `qa/end.cjs` 엔딩 · `qa/save.cjs` 저장·불러오기 · `qa/speed.cjs` 가로 최고 속도 · `qa/rotor.cjs` 헬기 날개 소리 · `qa/docs.cjs` 문서와 판 번호(Playwright, `qa/docs.cjs`는 node).
 - `tools/subset-font.py` — 게임 화면 손글씨(Gaegu)에서 쓰는 글자만 추린다. 게임 화면의 글을 고치면 다시 돌린다. 추린 글자는 `fonts/Gaegu.subset.txt`에 적힌다.
 
 ## 한계
 
-- 배경 음악은 없다. 효과음과, 일곱 스테이지를 마쳤을 때의 짧은 승리 팡파르가 있다.
+- 배경 음악은 없다. 효과음과 헬기 날개 소리, 일곱 스테이지를 마쳤을 때의 짧은 승리 팡파르가 있다.
 - 난이도 고르기와 2인용은 없다.
 - 브라우저 칸에 저장한 판은 그 기기의 그 브라우저에만 남는다. 오래 둘 판은 `.dhsave` 파일로 내려받아 둔다.
 - 실기기 미확인.

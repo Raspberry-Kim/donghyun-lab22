@@ -466,6 +466,18 @@ function draw() {
   }
 }
 
+/* ---------- 헬기 날개 소리 ----------
+   플레이 중에만 낸다. 멈춤 메뉴·안내 카드·종이 넘김·게임 오버에서는 잦아든다.
+   땅에 앉아 있으면 느리고 작게, 날면 보통으로, 빨리 날거나 올라가면 조금 더 빠르게 돈다. 추락하는 동안은 점점 느려진다 */
+function rotorSound() {
+  const g = A.g, p = g && g.pl;
+  if (!p || A.scr !== 'game' || menu || A.turn > 0 || g.mode !== 'play' || (p.dead && p.boomed) || document.hidden) { SFX.rotor(0); return; }
+  if (p.dead) { SFX.rotor(Math.max(0.3, 1 - p.dead / 120), 0.7); return; }
+  if (p.landed) { SFX.rotor(0.72, 0.6); return; }
+  const sp = Math.min(1, Math.hypot(p.vx / DS.K.VF, p.vy / DS.K.VY));
+  SFX.rotor(1 + 0.1 * sp + (p.vy < -0.1 ? 0.05 : 0), 1);
+}
+
 /* ---------- 돌리기: 1초에 60걸음 ---------- */
 let fN = 0, fT = 0;
 function frame(now) {
@@ -481,6 +493,7 @@ function frame(now) {
     while (acc >= STEP - 0.01 && n < 6) { step(); acc -= STEP; n++; if (A.scr === 'load') { acc = 0; return; } }
     if (n) A.st.step = A.st.step * 0.95 + (performance.now() - t0) / n * 0.05;
   }
+  rotorSound();
   const t1 = performance.now(); draw(); A.st.draw = A.st.draw * 0.95 + (performance.now() - t1) * 0.05;
   if (A.debug) {
     fN++; if (now - fT > 500) { A.st.fps = fN * 1000 / (now - fT); fN = 0; fT = now; const g = A.g, el = $('#dbg'); if (el) el.textContent = A.st.fps.toFixed(0) + ' fps · 걸음 ' + A.st.step.toFixed(2) + 'ms · 그리기 ' + A.st.draw.toFixed(2) + 'ms' + (g ? ' · 적 ' + g.en.length + ' · 탄 ' + g.bullets.length + ' · 내 탄 ' + g.shots.length : ''); }
