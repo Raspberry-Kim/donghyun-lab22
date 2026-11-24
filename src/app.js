@@ -181,7 +181,7 @@ function backToSetup() {
   A.g = null; A.live = false; A.turn = 0; closeMenu(); IN.clear(); watch = null;
   $('#setup-panel').hidden = false; $('#hud').hidden = true; $('#board-wrap').classList.remove('live'); $('#touchpad').classList.remove('on'); exitFull(); $('#full').disabled = true;
   later(() => { demoStart(); A.scr = 'ready'; A.t = 0; });
-  readyLabels(); status('출전 준비'); result('다시 나서려면 코드를 고치거나 그대로 출전을 누르자.'); fit();
+  readyLabels(); status('출전 준비'); result('다시 나서려면 코드를 고치거나 그대로 출전을 누르자.'); renderSlotList(); fit();
 }
 $('#concede').onclick = () => { if (!A.live || A.scr === 'load' || A.scr === 'prep') return; if (inGame()) confirmMenu('포기하고 출전 준비로 돌아갈까?', [['포기한다', backToSetup], ['계속 간다', () => { }]]); else if (!menu) backToSetup(); };
 
@@ -219,14 +219,14 @@ function closeMenu() { menu = null; $('#menu').hidden = true; last = 0; }
 function cancelMenu() { const c = menu && menu.onCancel; closeMenu(); if (c) c(); }
 function pickMenu() { const it = menu.items[menu.i]; if (!it || it.off) return; closeMenu(); SFX.play('ok'); it.fn(); }
 function confirmMenu(q, opts, back) { openMenu(q, opts.map(([label, fn]) => ({ label, fn })), back); }
-function mainMenu() { openMenu('잠시 멈춤', [['계속 간다', () => { }], [SFX.muted ? '소리 켜기' : '소리 끄기', () => { setSound(SFX.muted); mainMenu(); }], ['포기하고 출전 준비로', () => confirmMenu('포기하고 출전 준비로 돌아갈까?', [['포기한다', backToSetup], ['계속 간다', () => { }]], mainMenu)]]); }
+function mainMenu() { openMenu('잠시 멈춤', [['계속 간다', () => { }], [SFX.muted ? '소리 켜기' : '소리 끄기', () => { setSound(SFX.muted); mainMenu(); }], ['저장', saveMenu], ['불러오기', loadMenu], ['포기하고 출전 준비로', () => confirmMenu('포기하고 출전 준비로 돌아갈까?', [['포기한다', backToSetup], ['계속 간다', () => { }]], mainMenu)]]); }
 function menuKey(k) {                 // up · down · ok · back
   if (!menu) return;
   if (k === 'up' || k === 'down') { const n = menu.items.length; menu.i = (menu.i + (k === 'up' ? -1 : 1) + n) % n; SFX.play('tick'); drawMenu(); }
   else if (k === 'ok') pickMenu(); else if (k === 'back') cancelMenu();
 }
 const MENUKEY = { ArrowUp: 'up', ArrowDown: 'down', KeyX: 'ok', Space: 'ok', Enter: 'ok', NumpadEnter: 'ok', KeyZ: 'back', Escape: 'back', KeyP: 'back' };
-document.addEventListener('keydown', e => {          // 메뉴가 떠 있는 동안은 키를 여기서 받는다
+document.addEventListener('keydown', e => {          // 메뉴가 떠 있는 동안은 키를 여기서 받는다 (파일 고르기 창은 키를 누른 그 자리에서 열어야 한다)
   if (!menu || tab !== 'play' || e.metaKey || e.ctrlKey || e.altKey || typing()) return;
   const k = MENUKEY[e.code]; if (!k) return;
   e.preventDefault(); e.stopPropagation(); if (e.repeat && k !== 'up' && k !== 'down') return; menuKey(k);
@@ -235,6 +235,77 @@ document.addEventListener('keydown', e => {          // 메뉴가 떠 있는 동
 GP.start({ hint: 'A·R 기관포 · B·L 보조 무기 · X·Y·ZL·ZR 무기 바꾸기 · + 메뉴', buttons: { 4: 'z', 5: 'x', 6: 'shift', 7: 'shift' }, status: t => status(t),
   down(k) { if (menu) { if (tab === 'play') menuKey(k === 'x' || k === 'enter' ? 'ok' : k === 'z' ? 'back' : k); return; } IN.padDown(k); }, up(k) { IN.padUp(k); } });
 
+
+/* ---------- 저장·불러오기: 브라우저 칸 3개 + .dhsave 파일 ---------- */
+const SAVE_FORMAT = 'donghyunchop-save', SAVE_VERSION = 1, SLOT_KEY = n => 'donghyunchop:slot' + n, SLOTS = 3;
+function snapshot() {
+  const g = A.g; if (!g || !inGame()) throw new Error('지금은 저장할 수 없다.');
+  const logs = [...$('#log').children].reverse().map(li => li.textContent);
+  return { format: SAVE_FORMAT, version: SAVE_VERSION, savedAt: new Date().toISOString(), summary: { stage: g.stage + 1, stageName: g.S.name, lives: g.lives, saved: g.saved, need: g.need, score: g.score }, cfg: { ...cfg }, sum: { ...A.sum }, logSaved, state: g.save(), logs };
+}
+function restore(data) {
+  if (!data || data.format !== SAVE_FORMAT) throw new Error('동현촙 저장 파일이 아니다.');
+  if (data.version !== SAVE_VERSION) throw new Error('지원하지 않는 저장 형식 버전이다(' + data.version + ').');
+  const g = DS.Game.load(data.state, { sfx: SFX.play, hi: A.hi, god: A.god });             // 맞지 않으면 여기서 멈춘다. 지금 판은 그대로 남는다
+  const c = data.cfg || {}, m = data.sum || {}, int = (v, lo, hi, d) => Number.isInteger(v) && v >= lo && v <= hi ? v : d;
+  cfg = { lives: g.life0, stage: int(c.stage, 1, NSTAGE, 1), bg: int(c.bg, 1, NPAPER, 1), cap: g.cap };
+  feteOff();
+  const fresh = !A.live;
+  A.g = null; A.demo = null; A.live = true; A.turn = 0; closeMenu(); SFX.unlock(); IN.clear(); sortieCard(cfg); liveUI();
+  if (fresh && !A.auto) $('#board-wrap').scrollIntoView({ block: 'nearest', behavior: 'auto' });      // 불러오기 영역은 판에서 멀다. 곧바로 판으로 옮긴다
+  A.sum = { saved: int(m.saved, 0, 9999, 0), lost: int(m.lost, 0, 9999, 0) };
+  const l = $('#log'); l.innerHTML = ''; for (const t of (Array.isArray(data.logs) ? data.logs : []).slice(-38)) log(String(t).slice(0, 200));
+  status('불러오는 중');
+  setPaper(cfg.bg, () => later(() => {
+    R.prepare(g.L); A.g = g; A.scr = 'game'; A.t = 0;
+    watch = { stage: g.stage, mode: g.mode, lives: g.lives, lost: g.lost, conts: g.conts }; logSaved = int(data.logSaved, 0, g.saved, g.saved);
+    log('저장한 판을 불러왔다.'); $('#tile-info').textContent = g.S.note; $('#hint').innerHTML = HINT0; status('진행 중'); hud();
+    openMenu('저장한 판을 불러왔다. 준비되면 계속 간다.', [['계속 간다', () => { }], ['메뉴', mainMenu]], () => { });
+  }));
+}
+function readSlot(n) { try { const t = localStorage.getItem(SLOT_KEY(n)); return t ? JSON.parse(t) : null; } catch (e) { return null; } }
+function slotNote(d) { if (!d || !d.summary) return '비어 있음'; const t = new Date(d.savedAt), pad = v => String(v).padStart(2, '0'), s = d.summary; return `스테이지 ${s.stage} · 헬기 ${s.lives} · 구출 ${s.saved}/${s.need} · ${t.getMonth() + 1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())}`; }
+function toast(t, kind) { log(t); status(t, kind); }
+function saveToSlot(n) { let d; try { d = snapshot(); } catch (e) { toast(e.message); return; } try { localStorage.setItem(SLOT_KEY(n), JSON.stringify(d)); toast(`브라우저 칸 ${n}에 저장했다.`); renderSlotList(); } catch (e) { toast('브라우저 저장에 실패했다. 파일로 내려받아 저장하자.'); } }
+function deleteSlot(n) { try { localStorage.removeItem(SLOT_KEY(n)); } catch (e) { } renderSlotList(); }
+function saveToFile() { let d; try { d = snapshot(); } catch (e) { toast(e.message); return; } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' })); a.download = `donghyunchop-stage${d.summary.stage}-${d.summary.score}.dhsave`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); toast('저장 파일을 내려받았다.'); }
+function saveMenu() {
+  const items = [];
+  for (let n = 1; n <= SLOTS; n++) { const d = readSlot(n); items.push({ label: `브라우저 칸 ${n}`, note: slotNote(d), fn: () => { if (d) confirmMenu(`칸 ${n}에 덮어쓸까?`, [['덮어쓴다', () => { saveToSlot(n); mainMenu(); }], ['그만둔다', saveMenu]], saveMenu); else { saveToSlot(n); mainMenu(); } } }); }
+  items.push({ label: '파일로 내려받기', note: '.dhsave', fn: () => { saveToFile(); mainMenu(); } });
+  items.push({ label: '브라우저 칸 지우기', note: '', off: !Array.from({ length: SLOTS }, (_, i) => readSlot(i + 1)).some(Boolean), fn: deleteMenu });
+  openMenu('저장', items, mainMenu);
+}
+function deleteMenu() {
+  const items = [];
+  for (let n = 1; n <= SLOTS; n++) { const d = readSlot(n); items.push({ label: `브라우저 칸 ${n}`, note: slotNote(d), off: !d, fn: () => confirmMenu(`칸 ${n}${n === 2 ? '를' : '을'} 지울까? 되돌릴 수 없다.`, [['지운다', () => { deleteSlot(n); toast(`브라우저 칸 ${n}${n === 2 ? '를' : '을'} 지웠다.`); deleteMenu(); }], ['그만둔다', deleteMenu]], deleteMenu) }); }
+  openMenu('지울 칸', items, saveMenu);
+}
+function loadFrom(d) { try { restore(d); } catch (e) { const msg = '불러오기 실패: ' + e.message; if (A.live) { toast(msg, 'error'); if (inGame() && !menu) mainMenu(); } else { result(msg, 'error'); status('불러오기 실패', 'error'); } } }
+function loadMenu() {
+  const items = [];
+  for (let n = 1; n <= SLOTS; n++) { const d = readSlot(n); items.push({ label: `브라우저 칸 ${n}`, note: slotNote(d), off: !d, fn: () => confirmMenu('지금 판을 버리고 불러올까?', [['불러온다', () => loadFrom(readSlot(n))], ['그만둔다', loadMenu]], loadMenu) }); }
+  items.push({ label: '파일에서 불러오기', note: '.dhsave', fn: () => { mainMenu(); $('#load-file').click(); } });
+  openMenu('불러오기', items, mainMenu);
+}
+$('#load-file').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; if (A.scr === 'load' || A.scr === 'prep') return; let d = null; try { d = JSON.parse(await f.text()); } catch (err) { } loadFrom(d); };
+$('#load-file-setup').onchange = $('#load-file').onchange;
+document.querySelector('.load-head label').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#load-file-setup').click(); } });
+function renderSlotList() {
+  const box = $('#slot-list'); box.innerHTML = '';
+  for (let n = 1; n <= SLOTS; n++) {
+    const d = readSlot(n), b = document.createElement('button'); b.className = 'slot-btn'; b.disabled = !d;
+    b.innerHTML = `<b>칸 ${n}</b><span>${esc(slotNote(d))}</span>${d && d.summary ? `<small>${esc(d.summary.stageName || '')} · ${NUM(d.summary.score || 0)}점</small>` : ''}`;
+    b.onclick = () => { if (A.scr === 'load' || A.scr === 'prep') return; loadFrom(readSlot(n)); };
+    const row = document.createElement('div'); row.className = 'slot-row'; row.append(b);
+    if (d) {
+      const x = document.createElement('button'); x.className = 'slot-del'; x.type = 'button'; x.textContent = '지우기'; x.setAttribute('aria-label', `칸 ${n} 지우기`);
+      let t = 0; x.onclick = () => { if (!x.classList.contains('armed')) { x.classList.add('armed'); x.textContent = '정말 지운다'; t = setTimeout(() => { x.classList.remove('armed'); x.textContent = '지우기'; }, 4000); return; } clearTimeout(t); deleteSlot(n); status(`브라우저 칸 ${n}${n === 2 ? '를' : '을'} 지웠다.`); };
+      row.append(x);
+    }
+    box.append(row);
+  }
+}
 
 /* ---------- 화면 크기 ---------- */
 function fit() {
@@ -421,10 +492,10 @@ window.addEventListener('blur', () => { if (inGame() && !A.auto && !menu) mainMe
 /* ---------- 시험용 연결 ---------- */
 window.render_game_to_text = () => JSON.stringify({ screen: A.scr, live: A.live, sel: A.sel, cfg, paper: DS.PAPERS[DS.paperIdx].name, paused: !!menu, menu: menu ? { title: menu.title, items: menu.items.map(it => it.label), i: menu.i } : null, turning: A.turn > 0, muted: SFX.muted, petals: DHPETALS.on, hi: A.hi, sum: A.sum, coords: 'x는 왼쪽에서 오른쪽, y는 위에서 아래. 화면 400×225칸', game: A.g ? A.g.text() : null });
 window.advanceTime = ms => { A.manual = true; const n = Math.max(1, Math.round(ms / STEP)); for (let i = 0; i < n; i++) { if (A.scr === 'load') break; IN.frame(); step(); } if (A.scr !== 'load') draw(); return n; };
-window.__donghyunchop = { A, get cfg() { return cfg; }, set cfg(c) { cfg = c; sortieCard(cfg); }, get menu() { return menu; }, parseSortie, sortie, go, mainMenu, menuKey, closeMenu, backToSetup, fit, fete, feteOff, autoPilot, get petals() { return DHPETALS; } };
+window.__donghyunchop = { A, get cfg() { return cfg; }, set cfg(c) { cfg = c; sortieCard(cfg); }, get menu() { return menu; }, parseSortie, sortie, go, snapshot, restore, loadFrom, readSlot, saveToSlot, mainMenu, menuKey, closeMenu, backToSetup, fit, fete, feteOff, autoPilot, get petals() { return DHPETALS; } };
 
 if (A.debug) { const d = $('#dbg'); if (d) d.hidden = false; }
-selectExample(); sortieCard(cfg); readyLabels(); fit();
+selectExample(); sortieCard(cfg); readyLabels(); renderSlotList(); fit();
 
 /* ---------- 전체 화면(동현램과 같은 규칙) ---------- */
 const stageFull=$('#stage-full');

@@ -394,5 +394,60 @@
       need: this.need, total: this.total, aboard: this.aboard, saved: this.saved, lost: this.lost, cap: this.cap, lives: this.lives, score: this.score, weapon: this.wsel, weapons: this.wp,
       base: { x: this.base.x, side: this.base.side }, huts: this.huts.map(h => ({ x: h.x, inside: h.n })), waiting: this.hs.filter(h => h.st === 'wave').length, enemies: this.en.filter(e => !e.dead && e.d.hp).length, shots: this.shots.length, bullets: this.bullets.length, why: this.why };
   };
+  /* ── 저장·불러오기 ──  함수와 서로 가리키는 것(스테이지 땅, 건물의 벽)만 빼고 그대로 적는다. 땅과 벽은 스테이지 번호로 다시 만든다 */
+  const SKIP = { sfx: 1, god: 1, rng: 1, L: 1, S: 1, solids: 1, base: 1, en: 1 };
+  G.save = function () {
+    const o = {};
+    for (const k in this) if (Object.prototype.hasOwnProperty.call(this, k) && !SKIP[k] && typeof this[k] !== 'function') o[k] = this[k];
+    o.rng = this.rng.get();
+    o.en = this.en.map(e => { const q = {}; for (const k in e) if (k !== 'd' && k !== 'sol') q[k] = e[k]; return q; });
+    return JSON.parse(JSON.stringify(o));
+  };
+  const isN = v => typeof v === 'number' && isFinite(v), isI = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+  const SHOTK = { pb: 1, drop: 1, bomb: 1, mis: 1 }, EBK = { eb: 1, shell: 1, ebomb: 1, emis: 1 }, FXK = { hit: 1, splash: 1, spark: 1, boom_s: 1, boom_m: 1, boom_l: 1 }, HSK = { wave: 1, go: 1, base: 1, gone: 1 };
+  Game.load = function (d, o) {
+    o = o || {};
+    const bad = m => { throw new Error(m); };
+    if (!d || typeof d !== 'object') bad('판 정보가 없다.');
+    if (!isI(d.stage, 0, DS.STAGES.length - 1)) bad('스테이지 정보가 맞지 않는다.');
+    if (!isI(d.life0, 1, 9) || !isI(d.cap, 4, 16) || !isI(d.lives, 1, 99) || !isN(d.score) || d.score < 0 || !isI(d.conts, 0, 1e6)) bad('헬기·정원·점수 정보가 맞지 않는다.');
+    if (d.mode !== 'play') bad('이어 할 수 없는 장면에서 저장한 판이다.');
+    const p = d.pl;
+    if (!p || !isN(p.x) || !isN(p.y) || !isN(p.vx) || !isN(p.vy) || !isI(p.face, -1, 1) || !isI(p.from, -1, 1) || !isN(p.dmg) || p.dmg < 0 || p.dmg > 100 || !isN(p.dead) || !isN(p.rot) || !p.hold || !isN(p.hold.l) || !isN(p.hold.r)) bad('헬기 상태가 맞지 않는다.');
+    const w = d.wp;
+    if (!w || !isI(w.B, 0, 999) || !isI(w.M, 0, 999) || !isI(w.S, 0, 999) || WORDER.indexOf(d.wsel) < 0) bad('보조 무기 정보가 맞지 않는다.');
+    ['en', 'shots', 'bullets', 'hs', 'huts', 'items', 'fx', 'pops', 'trigs'].forEach(k => { if (!Array.isArray(d[k]) || d[k].length > 2000) bad('판 정보가 맞지 않는다(' + k + ').'); });
+    if (!isN(d.rng) || !isN(d.t) || !isN(d.modeT) || !isN(d.cam) || !isN(d.look) || !isN(d.shake)) bad('진행 정보가 맞지 않는다.');
+    if (!isI(d.saved, 0, 999) || !isI(d.lost, 0, 999) || !isI(d.aboard, 0, d.cap)) bad('구출 정보가 맞지 않는다.');
+    d = JSON.parse(JSON.stringify(d));
+    const g = new Game({ lives: d.life0, cap: d.cap, stage: d.stage, sfx: o.sfx, god: o.god, hi: Math.max(o.hi || 0, isN(d.hi) ? d.hi : 0) });
+    const L = g.L, xin = v => isN(v) && v > -400 && v < L.len + 400, yin = v => isN(v) && v > -400 && v < 800;
+    if (!xin(p.x) || !yin(p.y)) bad('헬기 자리가 맞지 않는다.');
+    if (d.huts.length !== g.huts.length || d.trigs.length !== g.trigs.length) bad('스테이지 정보가 맞지 않는다.');
+    d.huts.forEach((h, i) => { const b = g.huts[i]; if (!h || h.x !== b.x || !isI(h.n, 0, b.n0) || !isN(h.t)) bad('막사 정보가 맞지 않는다.'); h.y = b.y; h.n0 = b.n0; h.grp = b.grp; });
+    d.trigs.forEach((q, i) => { const b = g.trigs[i]; if (!q || !isN(q.cd)) bad('스테이지 정보가 맞지 않는다.'); q.x = b.x; q.w = b.w; });
+    // 나무의 벽은 번호로 다시 잇는다. 저장한 판에 없는 나무는 이미 쓰러진 것이다
+    const sol = {}; g.en.forEach(e => { if (e.sol) { sol[e.id] = e.sol; e.sol.off = true; e.sol.e = null; } });
+    const E = d.en.map(q => {
+      const e = Object.assign({}, q), def = e && EN[e.k];
+      if (!def || !xin(e.x) || !yin(e.y) || !isN(e.hp) || !isN(e.t) || !isN(e.id)) bad('적 정보가 맞지 않는다.');
+      e.d = def;
+      if (e.k === 'tree') { const s = sol[e.id]; if (!s || !isN(e.h)) bad('나무 정보가 맞지 않는다.'); e.sol = s; s.e = e; s.off = !!e.dead; }
+      return e;
+    });
+    d.shots.forEach(s => { if (!s || !SHOTK[s.k] || !xin(s.x) || !yin(s.y) || !isN(s.vx) || !isN(s.vy) || !isN(s.t)) bad('탄 정보가 맞지 않는다.'); });
+    d.bullets.forEach(b => { if (!b || !EBK[b.k] || !xin(b.x) || !yin(b.y) || !isN(b.vx) || !isN(b.vy) || !isN(b.t) || !isN(b.g)) bad('적탄 정보가 맞지 않는다.'); });
+    d.hs.forEach(h => { if (!h || !HSK[h.st] || !xin(h.x) || !yin(h.y) || !isN(h.t)) bad('사람 정보가 맞지 않는다.'); });
+    d.items.forEach(it => { if (!it || (it.k !== 'star' && !(it.k === 'box' && DS.WPN[it.w])) || !xin(it.x) || !yin(it.y) || !isN(it.t)) bad('보급 정보가 맞지 않는다.'); });
+    d.fx.forEach(f => { if (!f || !FXK[f.k] || !isN(f.x) || !isN(f.y) || !isN(f.t) || !isN(f.n) || !isN(f.rate)) bad('효과 정보가 맞지 않는다.'); });
+    d.pops.forEach(q => { if (!q || typeof q.txt !== 'string' || !isN(q.x) || !isN(q.y) || !isN(q.t)) bad('효과 정보가 맞지 않는다.'); });
+    if (d.msg && (typeof d.msg.txt !== 'string' || !isN(d.msg.t))) d.msg = null;
+    const rs = d.rng;
+    ['sfx', 'god', 'rng', 'L', 'S', 'solids', 'base', 'en', 'need', 'total', 'hi'].forEach(k => { delete d[k]; });
+    Object.assign(g, d);
+    g.en = E; g.why = ''; g.rng = DS.RNG(1); g.rng.set(rs);
+    return g;
+  };
+
   DS.Game = Game;
 })();
