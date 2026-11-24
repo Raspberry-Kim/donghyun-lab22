@@ -90,6 +90,35 @@
     for (let i = 0; i < 12; i++) { const b = 14 + i / 6, k = i / 11; timp(b, 45, 0.1 + 0.3 * k); pnoise(at(b), 0.05, 'bandpass', 1900, 0.7, 0.05 + 0.2 * k, 0.002, pre); }
     crash(16, 0.28, 1.1); timp(16, 50, 0.5); fanEnd = performance.now() + (at(17.4) + 0.5 - ac.currentTime) * 1000;
   }
+  /* 헬기 날개 소리: 짧은 효과음과 달리 계속 울리므로 따로 묶어 둔다(rot).
+     낮게 거른 잡음과 낮은 음을 날개가 지나가는 박자(1초에 열두 번쯤)로 끊어 '두두두두' 소리를 만든다.
+     박자의 모양은 톱니를 여섯 배음까지만 더한 것이다: 탁 치고 스르르 잦아든다.
+     세기는 구한 사람이 집에 들어갈 때 나는 소리(medal, 0.09)에 맞춘다 */
+  const ROT = { vol: 0.09, gain: 1.45, hz: 12 };      // gain: 끊어 내는 소리의 가장 큰 순간이 medal의 0.09와 비슷해지도록 맞춘 배수
+  let rot = null;
+  function rotorMake() {
+    const out = ac.createGain(), am = ac.createGain(), lfo = ac.createOscillator(), dep = ac.createGain();
+    out.gain.value = 0; out.connect(master); am.gain.value = 0.5; am.connect(out);
+    const im = new Float32Array(7), re = new Float32Array(7); for (let n = 1; n < 7; n++) im[n] = 1 / n;
+    lfo.setPeriodicWave(ac.createPeriodicWave(re, im)); lfo.frequency.value = ROT.hz; dep.gain.value = 0.5; lfo.connect(dep); dep.connect(am.gain);
+    const s = ac.createBufferSource(), lp = ac.createBiquadFilter(), gl = ac.createGain(), bp = ac.createBiquadFilter(), gb = ac.createGain(), o = ac.createOscillator(), go = ac.createGain();
+    /* 작은 스피커에서도 들리도록 150~600Hz 쪽에 힘을 싣고, 그 아래 낮은 음은 조금만 깐다 */
+    s.buffer = nbuf; s.loop = true; lp.type = 'lowpass'; lp.frequency.value = 420; lp.Q.value = 1.1; gl.gain.value = 1.7; bp.type = 'bandpass'; bp.frequency.value = 950; bp.Q.value = 1.1; gb.gain.value = 0.6;
+    s.connect(lp); lp.connect(gl); gl.connect(am); s.connect(bp); bp.connect(gb); gb.connect(am);
+    o.type = 'triangle'; o.frequency.value = 104; go.gain.value = 0.13; o.connect(go); go.connect(am);
+    s.start(); o.start(); lfo.start();
+    rot = { out, lfo, lp, o, on: false, rate: 0, lvl: 0 };
+  }
+  function rotorSet(rate, lvl) {
+    const off = !rate || !ac || muted || ac.state !== 'running';
+    if (off) { if (rot && rot.on) { rot.on = false; rot.rate = 0; rot.lvl = 0; try { rot.out.gain.cancelScheduledValues(ac.currentTime); rot.out.gain.setTargetAtTime(0, ac.currentTime, 0.05); } catch (_) { } } return; }
+    if (!rot) rotorMake();
+    lvl = lvl == null ? 1 : lvl;
+    if (rot.on && Math.abs(rate - rot.rate) < 0.004 && Math.abs(lvl - rot.lvl) < 0.01) return;
+    const t = ac.currentTime; rot.on = true; rot.rate = rate; rot.lvl = lvl;
+    rot.out.gain.setTargetAtTime(ROT.vol * ROT.gain * lvl, t, 0.07); rot.lfo.frequency.setTargetAtTime(ROT.hz * rate, t, 0.09);
+    rot.lp.frequency.setTargetAtTime(300 + 120 * rate, t, 0.09); rot.o.frequency.setTargetAtTime(104 * (0.7 + 0.3 * rate), t, 0.09);
+  }
   const GAP = { shot: 0.07, eshot: 0.12, boom_s: 0.05, boom: 0.06, medal: 0.04, item: 0.04 };
   DS.Sfx = {
     /* 소리 장치가 돌고 있지 않으면 다시 켠다. Safari는 탭을 바꾸거나 통화가 끝난 뒤 'interrupted'로 남는다 */
@@ -102,13 +131,16 @@
     },
     /* 승리 팡파르를 울린다. 소리가 꺼져 있거나 소리 장치가 아직 열리지 않았으면 내지 않는다 */
     pomp() { if (!ac || muted || ac.state !== 'running') return false; try { pomp(); } catch (_) { hush(); return false; } played.push('pomp'); if (played.length > 40) played.shift(); return true; },
+    /* 헬기 날개 소리. rate는 날개가 도는 빠르기(1이 보통, 0이면 끈다), lvl은 세기(1이 보통). 걸음마다 불러도 된다 */
+    rotor(rate, lvl) { try { rotorSet(rate, lvl); } catch (_) { } },
+    get rotorState() { return rot ? { on: rot.on, rate: rot.rate, lvl: rot.lvl } : { on: false, rate: 0, lvl: 0 }; },
     /* 팡파르를 멈춘다(짧은 효과음은 그대로 둔다) */
     stop() { hush(); },
     /* 팡파르가 울리는 중인가 · 실제로 낸 팡파르 기록(시험이 읽는다) */
     get ringing() { return !!fan && performance.now() < fanEnd; },
     get played() { return played.slice(); },
     get muted() { return muted; },
-    setMuted(m) { muted = !!m; if (master) master.gain.value = muted ? 0 : 0.55; if (muted) hush(); },
+    setMuted(m) { muted = !!m; if (master) master.gain.value = muted ? 0 : 0.55; if (muted) { hush(); rotorSet(0); } },
     get ready() { return !!ac && ac.state === 'running'; }
   };
 })();
