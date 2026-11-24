@@ -3,7 +3,7 @@ message: "If you use this software, please cite it using the metadata below."
 title: "Donghyunchop (동현촙): a single-player pencil-sketch rescue-helicopter laboratory in the manner of Choplifter II, with the number of helicopters, the starting stage, the paper colour and the seating capacity set through the esoteric language Donghyun-lang"
 type: software
 doi: "10.5281/zenodo.24486348"
-version: "0.03"
+version: "0.04"
 date-released: "2026-11-24"
 authors:
   - family-names: Kim
