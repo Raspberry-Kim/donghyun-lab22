@@ -76,7 +76,7 @@
   };
   G.inRock = function (x, y) { const L = this.L; if (x < 0 || x > L.len) return true; const g = L.gAt(x); return y > g || y < L.cAt(x) || (L.sea && g > L.sea && y > L.sea + 1); };
 
-  /* ───────── 보조: 효과·점수·피해 ───────── */
+  /* ───────── 보조: 효과·점수·데미지 ───────── */
   G.addFx = function (k, x, y) { const n = k === 'hit' ? 2 : k === 'splash' || k === 'spark' ? 3 : DS.BOOM[k.slice(5)]; this.fx.push({ k: k, x: x, y: y, t: 0, n: n, rate: k === 'hit' ? 3 : k === 'boom_l' ? 5 : 4 }); };
   G.pop = function (txt, x, y) { this.pops.push({ txt: txt, x: x, y: y, t: 0 }); };
   G.say = function (txt, dur) { this.msg = { txt: txt, t: dur || 150 }; };
@@ -87,7 +87,7 @@
     if (p.dmg >= 100) this.crash();
     return true;
   };
-  G.hurt = function (n) {      // 비·물·간헐천처럼 닿아 있는 동안 조금씩 쌓이는 피해
+  G.hurt = function (n) {      // 비·물·간헐천처럼 닿아 있는 동안 조금씩 쌓이는 데미지
     const p = this.pl; if (p.dead || p.shield > 0 || this.god || this.mode !== 'play') return;
     p.dmg += n; p.wet = 8; if (this.t % 14 === 0) this.sfx('tick');
     if (p.dmg >= 100) this.crash();
